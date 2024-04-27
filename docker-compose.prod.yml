@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.prod
+    volumes: []
+    environment:
+      NODE_ENV: production
+    command: ["node", "dist/index.js"]

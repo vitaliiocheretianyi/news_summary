@@ -1,0 +1,23 @@
+# Use the official Node.js 16 image as a parent image
+FROM node:16
+
+# Set the working directory inside the container
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json (or npm-shrinkwrap.json)
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install --only=production
+
+# Copy the rest of your app's source code from your host to your image filesystem.
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Bind the port that the app runs on
+EXPOSE 4000
+
+# Define the command to run your app using the compiled JavaScript
+CMD [ "node", "dist/index.js" ]
