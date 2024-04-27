@@ -1,0 +1,9 @@
+node_modules
+npm-debug.log
+dist
+.git
+.gitignore
+.dockerignore
+**/*.md
+**/*.test.ts
+**/*.spec.ts
