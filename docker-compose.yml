@@ -1,11 +1,30 @@
 version: '3.8'
 
 services:
-  app:
-    container_name: my-app
+  backend:
+    container_name: my-app-backend
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.dev  # Or Dockerfile.prod depending on the environment
     ports:
       - "4000:4000"
     volumes:
       - ./Backend:/usr/src/app
+      - /usr/src/app/node_modules
     environment:
-      NODE_ENV: development
+      NODE_ENV: development  # Or 'production' based on your setup
+    command: ["npm", "start"]
+
+  frontend:
+    container_name: my-app-frontend
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile.dev  # Or Dockerfile.prod depending on the environment
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development  # Or 'production' based on your setup
+    command: ["npm", "start"]

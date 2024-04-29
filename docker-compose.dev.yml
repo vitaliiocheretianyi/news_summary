@@ -1,10 +1,23 @@
 version: '3.8'
 
 services:
-  app:
+  backend:
     build:
       context: ./Backend
       dockerfile: Dockerfile.dev
     volumes:
       - ./Backend/src:/usr/src/app/src
     command: ["nodemon", "--exec", "ts-node", "./src/index.ts"]
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./Frontend/src:/app/src
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+    command: ["npm", "start"]
