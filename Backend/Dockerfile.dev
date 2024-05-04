@@ -1,21 +1,23 @@
-# Use the official Node.js 16 image as a parent image
+# Use the official Node.js 16 image as the base
 FROM node:16
 
-# Set the working directory inside the container
+# Set the working directory in the Docker container
 WORKDIR /usr/src/app
 
-# Install global dependencies
-RUN npm install -g nodemon
-
-# Copy package.json and package-lock.json (or npm-shrinkwrap.json)
+# Copy package.json and package-lock.json (or npm-shrinkwrap.json) to Docker environment
 COPY package*.json ./
 
-# Install project dependencies
+# Install all dependencies including devDependencies for development
 RUN npm install
 
-# Bind the port that the app runs on
+# Copy the rest of your application's source code from the host to the Docker container
+COPY . .
+
+# Expose the port the app runs on
 EXPOSE 4000
 
-# Mount the source code into the container, the code is run directly from here
-# The actual source directory will be mounted at runtime
-CMD ["nodemon", "--exec", "ts-node", "./src/index.ts"]
+# Set environment variable to development (useful for conditional configurations in app)
+ENV NODE_ENV=development
+
+# Use npx to run nodemon
+CMD ["npx", "nodemon", "--exec", "ts-node", "src/index.ts"]

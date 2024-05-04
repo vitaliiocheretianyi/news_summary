@@ -1,26 +1,37 @@
 import express from 'express';
-import { graphqlHTTP } from 'express-graphql';
-import { buildSchema } from 'graphql';
+import { ApolloServer } from 'apollo-server-express';
+import { typeDefs } from './schema/authSchema';
+import resolvers from './resolvers/authResolver';
+import connectDB from './config/database';
 
-// Construct a schema, using GraphQL schema language
-const schema = buildSchema(`
-  type Query {
-    hello: String
-  }
-`);
-
-// The root provides a resolver function for each API endpoint
-const root = {
-  hello: () => {
-    return 'Hello world!';
-  },
-};
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
-app.use('/graphql', graphqlHTTP({
-  schema: schema,
-  rootValue: root,
-  graphiql: true,
-}));
 
-app.listen(4000, () => console.log('Welcome to localhost:4000/graphql'));
+async function createServer() {
+  try {
+    // Connect to MongoDB
+    await connectDB();
+
+    // Create an Apollo Server instance
+    const server = new ApolloServer({
+      typeDefs,
+      resolvers,
+      context: ({ req }) => ({ req }) // Pass context to resolvers
+    });
+
+    // Start the Apollo Server
+    await server.start();
+
+    // Apply Apollo middleware to the Express application
+    server.applyMiddleware({ app, path: '/graphql' });
+
+    // Start the Express server
+    app.listen(4000, () => console.log('Server running at http://localhost:4000/graphql'));
+  } catch (error) {
+    console.error('Error setting up the server:', error);
+  }
+}
+
+createServer();

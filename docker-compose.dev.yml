@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./Backend/src:/usr/src/app/src
-    command: ["nodemon", "--exec", "ts-node", "./src/index.ts"]
+    command: ["npx", "nodemon", "--exec", "ts-node", "src/index.ts"]
 
   frontend:
     build:
