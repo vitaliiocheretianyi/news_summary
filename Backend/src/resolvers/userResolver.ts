@@ -1,83 +1,101 @@
 import { User } from '../models/User';
+import { UserInterest } from '../models/UserInterest';
+import { verifyToken } from '../utils/tokenUtils';
 import { hashPassword, comparePassword, generateToken } from '../utils/auth';
-import { validateEmail } from '../utils/emailUtils'; // Import the validateEmail function from the utility file
-import { validatePassword } from '../utils/passwordUtils'; // Import the validatePassword function from the utility file
+import { validateEmail } from '../utils/emailUtils'; 
+import { validatePassword } from '../utils/passwordUtils'; 
 
 export const resolvers = {
-  Mutation: {
-    async register(_: any, args: { username: string; email: string; password: string }) {
-      // Validate email format
-      if (!validateEmail(args.email)) {
-        throw new Error('Invalid email format');
-      }
-
-      // Validate password strength and complexity
-      if (!validatePassword(args.password)) {
-        throw new Error('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character');
-      }
-
-      // Hash the valid password
-      const hashedPassword = await hashPassword(args.password);
-      // Create and save the new user with validated email and hashed password
-      const user = new User({
-        username: args.username,
-        email: args.email,
-        password: hashedPassword
-      });
-
-      try {
-        await user.save();
-      } catch (error) {
-        throw new Error('Error saving user: ' + error.message);
-      }
-
-      // Generate token for the new user
-      const token = generateToken(user.id);
-      return { token };
-    },
-
-    async loginWithUsername(_: any, args: { username: string; password: string }) {
-      // Find user by username and validate password
-      const user = await User.findOne({ username: args.username });
-      if (!user || !(await comparePassword(args.password, user.password))) {
-        throw new Error('Invalid credentials');
-      }
-      // Generate token for logged in user
-      const token = generateToken(user.id);
-      return { token };
-    },
-
-    async loginWithEmail(_: any, args: { email: string; password: string }) {
-      // Validate email format
-      if (!validateEmail(args.email)) {
-        throw new Error('Invalid email format');
-      }
-      // Find user by email and validate password
-      const user = await User.findOne({ email: args.email });
-      if (!user || !(await comparePassword(args.password, user.password))) {
-        throw new Error('Invalid credentials');
-      }
-      // Generate token for logged in user
-      const token = generateToken(user.id);
-      return { token };
-    },
-
-    async deleteAccount(_: any, args, context: { user: any }) {
-      if (!context.user) {
-        throw new Error("Unauthorized");
-      }
-
-      // Ensure the user can only delete their own account
-      const user = await User.findById(context.user.id);
+  Query: {
+    async getUser(_: any, args, context: { token: string }) {
+      verifyToken(context.token);
+      const user = await User.findById(args.id);
       if (!user) {
         throw new Error("User not found");
       }
 
-      if (user.id !== context.user.id) {
-        throw new Error("Unauthorized access to delete account");
+      return user._id;
+    }
+  },
+  Mutation: {
+    async changeUsername(_: any, {username}: {username: string}, context: { user: any, token: string }) {
+      if (!context.user) {
+          throw new Error("Unauthorized");
+      }
+  
+      const user = await User.findById(context.user.id);
+      if (!user) {
+          throw new Error("User not found");
+      }
+  
+      if (user.id.toString() !== context.user.id) {
+          throw new Error("Unauthorized access to delete account");
       }
 
+      if (username) user.username = username;
+
+      await user.save();
+  
+      return { success: true, message: "Username updated successfully" };
+    },
+    async changeEmail(_: any, {email}: {email: string}, context: { user: any, token: string }) {
+      if (!context.user) {
+          throw new Error("Unauthorized");
+      }
+  
+      const user = await User.findById(context.user.id);
+      if (!user) {
+          throw new Error("User not found");
+      }
+  
+      if (user.id.toString() !== context.user.id) {
+          throw new Error("Unauthorized access to delete account");
+      }
+
+      if (email) user.email = email;
+
+      await user.save();
+  
+      return { success: true, message: "email updated successfully" };
+    },
+    async changePassword(_: any, {password}: {password: string}, context: { user: any, token: string }) {
+      if (!context.user) {
+          throw new Error("Unauthorized");
+      }
+  
+      const user = await User.findById(context.user.id);
+      if (!user) {
+          throw new Error("User not found");
+      }
+  
+      if (user.id.toString() !== context.user.id) {
+          throw new Error("Unauthorized access to delete account");
+      }
+
+      if (validatePassword(password)) user.password = await hashPassword(password);
+
+      await user.save();
+  
+      return { success: true, message: "Password updated successfully" };
+    },
+
+    async deleteAccount(_: any, args, context: { user: any, token: string }) {
+      if (!context.user) {
+          throw new Error("Unauthorized");
+      }
+  
+      const user = await User.findById(context.user.id);
+      if (!user) {
+          throw new Error("User not found");
+      }
+  
+      if (user.id.toString() !== context.user.id) {
+          throw new Error("Unauthorized access to delete account");
+      }
+  
+      await UserInterest.deleteMany({ userId: user.id });
       await User.findByIdAndDelete(user.id);
+  
       return { success: true, message: "Account deleted successfully" };
     }
   }
