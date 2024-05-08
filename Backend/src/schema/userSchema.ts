@@ -1,19 +1,26 @@
 import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
-  type Mutation {
-    changePassword(oldPassword: String!, newPassword: String!): Response
-    changeUsername(newUsername: String!): Response
-    changeEmail(newEmail: String!): Response
-    deleteAccount: Response
-  }
+type Mutation {
+  changeUsername(username: String!): Response
+  changeEmail(email: String!): Response
+  changePassword(password: String!): Response
+  deleteAccount: Response
+}
 
-  type Response {
-    success: Boolean!
-    message: String!
-  }
+type Query {
+  getUser(id: String!): User
+}
 
-  type Query {
-    _: Boolean
-  }
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  password: String!
+}
+
+type Response {
+  success: Boolean!
+  message: String!
+}
 `;
