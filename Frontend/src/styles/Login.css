@@ -1,0 +1,83 @@
+/* General Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: white;
+    color: #d3d3d3; /* Off-white grey for text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45vw; /* 50% of 90vw */
+    max-width: 20vw; /* 50% of 40vw */
+    padding: 2.5vw; /* 50% of 5vw */
+    border-radius: 1vw; /* 50% of 2vw */
+    background-color: white;
+  }
+  
+  .form {
+    width: 100%;
+  }
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 2.5vw; /* 50% of 5vw */
+    color: #d3d3d3;
+  }
+  
+  .form-group {
+    margin-bottom: 2vw; /* 50% of 4vw */
+  }
+  
+  .input {
+    width: 100%;
+    padding: 1vw; /* 50% of 2vw */
+    font-size: 0.75vw; /* 50% of 1.5vw */
+    border: none;
+    border-bottom: 0.15vw solid transparent; /* 50% of 0.3vw */
+    outline: none;
+    transition: border-bottom 0.3s ease-in-out;
+  }
+  
+  .input:focus {
+    border-bottom: 0.15vw solid #d3d3d3; /* 50% of 0.3vw */
+  }
+  
+  .button {
+    width: 100%;
+    padding: 1vw; /* 50% of 2vw */
+    font-size: 0.75vw; /* 50% of 1.5vw */
+    border: 0.15vw solid transparent; /* 50% of 0.3vw */
+    border-radius: 1vw; /* 50% of 2vw */
+    background-color: white;
+    color: #d3d3d3;
+    text-align: center;
+    cursor: pointer;
+    transition: border 0.3s ease-in-out;
+  }
+  
+  .button:hover {
+    border: 0.15vw solid #d3d3d3; /* 50% of 0.3vw */
+  }
+  
+  .error {
+    color: #ff6b6b; /* Pinkish-red for error messages */
+    margin-top: 1vw; /* 50% of 2vw */
+    font-size: 0.75vw; /* 50% of 1.5vw */
+    text-align: center;
+  }
+  
+  .mt-2 {
+    margin-top: 1vw; /* 50% of 2vw */
+  }
+  
+  .w-100 {
+    width: 100%;
+  }

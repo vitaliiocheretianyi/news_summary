@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    container_name: my-app-backend
+    container_name: backend
     build:
       context: ./Backend
       dockerfile: Dockerfile.dev  # Or Dockerfile.prod depending on the environment
@@ -13,10 +13,11 @@ services:
       - /usr/src/app/node_modules
     environment:
       NODE_ENV: development  # Or 'production' based on your setup
-    command: ["npm", "start"]
+    networks:
+      - internal
 
   frontend:
-    container_name: my-app-frontend
+    container_name: frontend
     build:
       context: ./Frontend
       dockerfile: Dockerfile.dev  # Or Dockerfile.prod depending on the environment
@@ -27,4 +28,12 @@ services:
       - /app/node_modules
     environment:
       NODE_ENV: development  # Or 'production' based on your setup
-    command: ["npm", "start"]
+    networks:
+      - internal
+    depends_on:
+      - backend
+
+networks:
+  internal:
+    name: internal
+    driver: bridge
