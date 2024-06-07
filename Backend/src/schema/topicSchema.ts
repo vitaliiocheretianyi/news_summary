@@ -1,34 +1,30 @@
-// src/graphql/typeDefs.ts
 import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
   type NewsPost {
-    date: String!
-    summary: String!
-    url: String!
+    date: String
+    summary: String
+    url: String
   }
 
   type Week {
-    startDate: String!
-    endDate: String!
-    summary: String!
-    newsPosts: [NewsPost!]!
+    startDate: String
+    endDate: String
+    summary: String
+    newsPosts: [NewsPost]
   }
 
   type Topic {
+    id: ID!
     name: String!
-    weeks: [Week!]!
+    weeks: [Week]
   }
 
   type Query {
-    getAllTopics: [Topic!]!
-    getTopic(name: String!): Topic
-    getAllWeeks: [Week!]!
-    getWeekByDate(startDate: String!, endDate: String!): Week
+    searchTopics(name: String!): [Topic]
   }
 
   type Mutation {
-    createTopic(name: String!): Topic
-    addWeekToTopic(topicName: String!, startDate: String!, endDate: String!, summary: String!): Week
+    addTopic(name: String!): Topic
   }
 `;

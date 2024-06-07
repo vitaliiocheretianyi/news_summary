@@ -8,7 +8,7 @@ import { validatePassword } from '../utils/passwordUtils';
 export const resolvers = {
   Query: {
     async getUser(_: any, args, context: { token: string }) {
-      verifyToken(context.token);
+      //verifyToken(context.token);
       const user = await User.findById(args.id);
       if (!user) {
         throw new Error("User not found");

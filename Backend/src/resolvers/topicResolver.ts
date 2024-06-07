@@ -1,54 +1,59 @@
-// src/graphql/resolvers.ts
-import TopicModel from '../models/Topic'; // Update the path as needed
-import { verifyToken } from '../utils/tokenUtils'; // Update the path as needed
+import TopicModel from '../models/Topic'; // Adjust the path as necessary
+import { UserInterest } from '../models/UserInterest'; // Adjust the path as necessary
+import { AuthenticationError } from 'apollo-server-express';
 
 export const resolvers = {
   Query: {
-    getAllTopics: async (_, __, context) => {
-      //verifyToken(context.token);  // Verifying the token
-      return await TopicModel.find({});
-    },
-    getTopic: async (_, { name }, context) => {
-      //verifyToken(context.token);  // Verifying the token
-      return await TopicModel.findOne({ name });
-    },
-    getAllWeeks: async (_, __, context) => {
-      //verifyToken(context.token);  // Verifying the token
-      return await TopicModel.aggregate([
-        { $unwind: '$weeks' },
-        { $replaceRoot: { newRoot: '$weeks' } }
-      ]);
-    },
-    getWeekByDate: async (_, { startDate, endDate }, context) => {
-      //verifyToken(context.token);  // Verifying the token
-      const week = await TopicModel.findOne({
-        'weeks.startDate': new Date(startDate),
-        'weeks.endDate': new Date(endDate)
-      }, { 'weeks.$': 1 });
-      return week ? week.weeks[0] : null;
+    searchTopics: async (_, { name }, { user }) => {
+      if (!user) {
+        throw new AuthenticationError('You must be logged in');
+      }
+
+      try {
+        const topics = await TopicModel.find({
+          name: { $regex: name, $options: 'i' }
+        }).limit(3);
+
+        if (!topics.length) {
+          return [];
+        }
+
+        return topics;
+      } catch (error) {
+        console.error(error);
+        throw new Error('Error searching for topics');
+      }
     }
   },
   Mutation: {
-    createTopic: async (_, { name }, context) => {
-      //verifyToken(context.token);  // Verifying the token
-      const existingTopic = await TopicModel.findOne({ name });
-      if (existingTopic) {
-        throw new Error('Topic already exists.');
+    addTopic: async (_, { name }, { user }) => {
+      if (!user) {
+        throw new AuthenticationError('You must be logged in');
       }
-      return new TopicModel({ name, weeks: [] }).save();
-    },
-    addWeekToTopic: async (_, { topicName, startDate, endDate, summary }, context) => {
-      //verifyToken(context.token);  // Token verification for security
-      const topic = await TopicModel.findOne({ name: topicName });
-      if (!topic) {
-        throw new Error('Topic not found.');
+
+      try {
+        let topic = await TopicModel.findOne({ name });
+        if (!topic) {
+          topic = new TopicModel({ name });
+          await topic.save();
+        }
+
+        const userId = user.id;
+
+        const userInterest = await UserInterest.findOne({ userId });
+        if (userInterest) {
+          userInterest.interests.push(topic.id);
+          await userInterest.save();
+        } else {
+          const newUserInterest = new UserInterest({ userId, interests: [topic.id] });
+          await newUserInterest.save();
+        }
+
+        return topic;
+      } catch (error) {
+        console.error(error);
+        throw new Error('Error adding topic');
       }
-      const newWeek = { startDate: new Date(startDate), endDate: new Date(endDate), summary, newsPosts: [] };
-      if (topic.weeks.some(week => new Date(week.startDate) <= new Date(endDate) && new Date(week.endDate) >= new Date(startDate))) {
-        throw new Error('Week dates overlap with an existing week.');
-      }
-      topic.weeks.push(newWeek);
-      return topic.save();
     }
   }
 };
