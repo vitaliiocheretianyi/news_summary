@@ -1,0 +1,472 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: white;
+    color: #d3d3d3;
+}
+
+.search-bar input {
+    width: 20vw;
+    font-size: 0.75vw; /* 50% of 1.5vw */
+    border: none;
+    border: 0.15vw solid transparent; /* 50% of 0.3vw */
+    border-radius: 2vw;
+    padding: 2vh;
+    outline: none;
+    transition: border 0.3s ease-in-out;
+}
+
+.search-bar input:hover {
+    border: 0.15vw solid #d3d3d3; /* 50% of 0.3vw */
+}
+
+.header {
+    top:0;
+    left:0;
+    right: 0;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 0;
+    width: 100%;
+    background-color: white;
+    border-bottom: 0.15vw solid #d3d3d3;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+}
+
+.profile-icon {
+    padding-left: 50%;
+    align-content: center;
+    padding-top: 2vw; /* 50% of 2vw */
+    padding-bottom: 2vw; /* 50% of 2vw */
+}
+
+.homepage-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.burger-menu {
+    display: none;
+}
+
+.main-content {
+    padding-top: 5vh;
+    display: flex;
+    height: 100%;
+}
+
+.interests {
+    width: 45vw;
+    padding: 2.5vw;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.interests-container {
+    overflow-y: auto;
+    max-height: 80vh;
+    transition: all 0.3s ease-in-out;
+}
+
+.interest-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vw;
+    border-bottom: 0.15vw solid transparent;
+    cursor: pointer;
+    position: relative;
+    opacity: 1;
+    animation: fadeIn 0.3s forwards;
+    transition: opacity 0.3s;
+}
+
+.interest-item.fade-out {
+    opacity: 0;
+    animation: fadeOut 0.3s forwards;
+}
+
+.interest-item::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0.15vw;
+    background-color: #d3d3d3; /* Light grey */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.interest-item:hover::before {
+    opacity: 1;
+}
+
+.interest-item.selected::before {
+    opacity: 1;
+}
+
+.remove-button {
+    display: block;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #d3d3d3; /* Light grey */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.interest-item:hover .remove-button {
+    opacity: 1;
+}
+
+.news-summary {
+    width: 55vw;
+    padding: 2.5vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.news-summary-content {
+    margin: 2vh;
+    margin-left: 0;
+    margin-right: 0;
+    transition: transform 0.1s ease;
+}
+
+.news-summary-content.move-down {
+    transform: translateY(1vh); /* Adjust this value based on the height of the calendar */
+}
+
+.news-articles {
+    display: flex;
+    overflow-x: scroll;
+    gap: 1vw;
+    margin-top: 2vh;
+}
+
+.article {
+    min-width: 20vw;
+    padding: 1vw;
+    background-color: white;
+    border: 0.15vw solid #d3d3d3;
+    border-radius: 1vw;
+}
+
+.suggestions-popup {
+    position: fixed;
+    top: 5vh; /* Adjust based on header height */
+    left: 0;
+    width: 20vw;
+    background-color: white;
+    z-index: 1001;
+    border: 0.15vw solid #d3d3d3;
+    border-radius: 2vw;
+    max-height: 40vh;
+    overflow-y: auto;
+    margin-top: 1.5%;
+    margin-left: 10%;
+    opacity: 0;
+    transform: translateY(-10%);
+    animation: fadeInDown 0.3s forwards;
+}
+
+.suggestions-popup.fadeOut {
+    animation: fadeOutUp 0.3s forwards;
+}
+
+.suggestions-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.suggestion-item {
+    width: 20vw;
+    padding: 1vw;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+.calendarContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.calendar-button {
+    width: 10vw;
+    height: 5vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border: 0.15vw solid transparent;
+    border-radius: 2vw;
+    color: black;
+    font-size: 2vh;
+    transition: border-color 0.3s, color 0.3s;
+}
+
+.calendar-button:hover {
+    border-color: #000000;
+}
+
+.datesContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    opacity: 0;
+    transform: scale(0.95);
+    animation: fadeInScale 0.3s forwards;
+}
+
+.datesContainer.fadeOut {
+    animation: fadeOutScale 0.3s forwards;
+}
+
+.custom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vh;
+    background-color: white;
+    border-bottom: none; /* Remove bottom border */
+}
+
+.custom-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1vh;
+    color: #000000;
+}
+
+.confirm-button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background-color: #000000;
+    color: white;
+    border: .1vh solid transparent;
+    border-radius: 1vw;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.confirm-button:hover {
+    background-color: white;
+    color: black;
+    border-color: black;
+}
+
+.react-datepicker {
+    border: none;
+}
+
+.react-datepicker__header {
+    background-color: white;
+    border-bottom: none;
+}
+
+.react-datepicker__month-container {
+    background-color: white;
+}
+
+.react-datepicker__day--selected, .react-datepicker__day--in-range {
+    background-color: #e6f7ff; /* light blue */
+    color: black;
+    border-radius: 50%; /* Make days round */
+}
+
+.react-datepicker__day {
+    border-radius: 50%; /* Make all days round */
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10%);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeOutScale {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        top:0;
+        left:0;
+        right: 0;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        padding: 0;
+        width: 100%;
+        background-color: white;
+        border-bottom: 0.15vw solid #d3d3d3;
+        position: fixed;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .search-bar {
+        align-content: center;
+        width: 80%;
+    }
+
+    .search-bar input {
+        width: 65vw;
+        font-size: 2vh; /* 50% of 1.5vw */
+        border-radius: 5vh;
+        padding: 2vh;
+        padding-right: 0;
+    }
+
+    .profile-icon {
+        font-size: 3vh;
+        padding: 0;
+        border: 0;
+        align-content: center;
+        padding-right: 5%;
+    }
+
+    .burger-menu {
+        padding: 2vh;
+        font-size: 5vh;
+        display: block;
+    }
+
+    .interests {
+        width: 100vw;
+        padding-top: 3vh;
+    }
+
+    .main-content {
+        flex-direction: column;
+        padding-top: 8vh;
+    }
+
+    .news-summary {
+        width: 100vw;
+    }
+
+    .news-summary-content-text {
+        padding: 2vw;
+        font-size: 3vh;
+        word-spacing: 1vh;
+    }
+
+    .article{
+        width: 70vw;
+        padding: 2vw;
+        height: 20vh;
+    }
+
+    .suggestions-popup {
+        top: 10vh; /* Adjust based on header height in mobile */
+    }
+    
+    .calendar-button {
+        width: 50vw;
+        height: 5vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border: 0.15vw solid transparent;
+        border-radius: 4vw;
+        color: black;
+        font-size: 2vh;
+        transition: border-color 0.3s, color 0.3s;
+    }
+
+    .confirm-button {
+        display: block;
+        margin: 10px auto;
+        padding: 10px 20px;
+        background-color: #000000;
+        color: white;
+        border: .1vh solid transparent;
+        border-radius: 3vh;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .suggestions-popup{
+        width: 65vw;
+        margin-left: 12.5%;
+        border-radius: 4vh;
+        padding: 2vh;
+    }
+
+    .suggestion-item{
+        width: 50vw;
+        padding: 1vh;
+    }
+}

@@ -1,18 +1,22 @@
 import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
+  type Topic {
+    id: ID!
+    name: String!
+  }
+
   type UserInterest {
     userId: ID!
-    interests: [String]
+    interests: [Topic]
   }
 
   type Query {
-    getUserInterests(userId: ID!): UserInterest
+    getUserInterests: [String]
   }
 
   type Mutation {
-    addInterest(userId: ID!, interestName: String!): UserInterest
-    updateInterest(userId: ID!, oldInterestName: String!, newInterestName: String!): UserInterest
-    removeInterest(userId: ID!, interestName: String!): UserInterest
-  }
+    addInterest(interestName: String!): Boolean
+    removeInterest(interestName: String!): Boolean
+  }  
 `;
