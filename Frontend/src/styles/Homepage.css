@@ -2,7 +2,6 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Roboto', sans-serif;
-    background-color: white;
     color: #d3d3d3;
 }
 
@@ -22,8 +21,8 @@ body {
 }
 
 .header {
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
     right: 0;
     display: flex;
     justify-content: space-evenly;
@@ -44,6 +43,10 @@ body {
     padding-bottom: 2vw; /* 50% of 2vw */
 }
 
+.profile-icon * {
+    cursor: pointer;
+}
+
 .homepage-container {
     width: 100vw;
     height: 100vh;
@@ -58,27 +61,49 @@ body {
 .main-content {
     padding-top: 5vh;
     display: flex;
+    width: 100vw;
     height: 100%;
+    justify-content: space-between; /* Add this line to space between interests and news-summary */
 }
 
 .interests {
-    width: 45vw;
-    padding: 2.5vw;
-    background-color: white;
+    padding-top: 2.5vw;
+    width: 40%; /* Adjusted to take up 40% of the width */
+    display: flex;
+    flex-direction: column;
+    border-right: 0.15vw solid #d3d3d3; /* Add right border */
+    height: 90vh;
+}
+
+.interests-section {
+    width: 100%; /* Adjusted to take up 60% of the width */
+    height: 82.5vh;
     display: flex;
     flex-direction: column;
 }
 
 .interests-container {
-    overflow-y: auto;
     max-height: 80vh;
+    overflow-y: auto;
+    width: 100%; /* Ensure it takes up the full width of its container */
     transition: all 0.3s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.no-interests {
+    padding: 1vw;
+    font-size: 1.5vw;
+    text-align: center;
 }
 
 .interest-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
     padding: 1vw;
     border-bottom: 0.15vw solid transparent;
     cursor: pointer;
@@ -86,6 +111,14 @@ body {
     opacity: 1;
     animation: fadeIn 0.3s forwards;
     transition: opacity 0.3s;
+}
+
+.interest-item span {
+    padding-left: 5%;
+}
+
+.interest-item button {
+    padding-right: 5%;
 }
 
 .interest-item.fade-out {
@@ -128,34 +161,33 @@ body {
 }
 
 .news-summary {
-    width: 55vw;
-    padding: 2.5vw;
+    width: 60%; /* Adjusted to take up 60% of the width */
+    padding-top: 2.5vw;
     display: flex;
     flex-direction: column;
 }
 
 .news-summary-content {
-    margin: 2vh;
-    margin-left: 0;
-    margin-right: 0;
-    transition: transform 0.1s ease;
+    padding: 2vw;
+    padding-top: 1vh;
 }
 
-.news-summary-content.move-down {
-    transform: translateY(1vh); /* Adjust this value based on the height of the calendar */
+.no-interest-message {
+    max-width: 60vw;
+    margin: auto;
+    text-align: center;
 }
 
 .news-articles {
     display: flex;
     overflow-x: scroll;
-    gap: 1vw;
     margin-top: 2vh;
+    max-width: 70vw;
 }
 
 .article {
     min-width: 20vw;
     padding: 1vw;
-    background-color: white;
     border: 0.15vw solid #d3d3d3;
     border-radius: 1vw;
 }
@@ -165,9 +197,9 @@ body {
     top: 5vh; /* Adjust based on header height */
     left: 0;
     width: 20vw;
-    background-color: white;
     z-index: 1001;
     border: 0.15vw solid #d3d3d3;
+    background-color: white;
     border-radius: 2vw;
     max-height: 40vh;
     overflow-y: auto;
@@ -229,13 +261,6 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    opacity: 0;
-    transform: scale(0.95);
-    animation: fadeInScale 0.3s forwards;
-}
-
-.datesContainer.fadeOut {
-    animation: fadeOutScale 0.3s forwards;
 }
 
 .custom-header {
@@ -243,7 +268,6 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1vh;
-    background-color: white;
     border-bottom: none; /* Remove bottom border */
 }
 
@@ -268,7 +292,6 @@ body {
 }
 
 .confirm-button:hover {
-    background-color: white;
     color: black;
     border-color: black;
 }
@@ -278,12 +301,7 @@ body {
 }
 
 .react-datepicker__header {
-    background-color: white;
     border-bottom: none;
-}
-
-.react-datepicker__month-container {
-    background-color: white;
 }
 
 .react-datepicker__day--selected, .react-datepicker__day--in-range {
@@ -296,79 +314,16 @@ body {
     border-radius: 50%; /* Make all days round */
 }
 
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10%);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeOutUp {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(-10%);
-    }
-}
-
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes fadeOutScale {
-    from {
-        opacity: 1;
-        transform: scale(1);
-    }
-    to {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
-}
-
 @media (max-width: 768px) {
     .header {
-        top:0;
-        left:0;
+        top: 0;
+        left: 0;
         right: 0;
         display: flex;
         justify-content: space-evenly;
         align-items: center;
         padding: 0;
         width: 100%;
-        background-color: white;
         border-bottom: 0.15vw solid #d3d3d3;
         position: fixed;
         top: 0;
@@ -408,7 +363,9 @@ body {
     }
 
     .main-content {
+        display: flex;
         flex-direction: column;
+        justify-content: space-between;
         padding-top: 8vh;
     }
 
@@ -417,28 +374,26 @@ body {
     }
 
     .news-summary-content-text {
-        padding: 2vw;
+        width: 70vw;
         font-size: 3vh;
         word-spacing: 1vh;
     }
 
-    .article{
+    .article {
         width: 70vw;
-        padding: 2vw;
         height: 20vh;
     }
 
     .suggestions-popup {
         top: 10vh; /* Adjust based on header height in mobile */
     }
-    
+
     .calendar-button {
         width: 50vw;
         height: 5vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: white;
         border: 0.15vw solid transparent;
         border-radius: 4vw;
         color: black;
@@ -458,15 +413,59 @@ body {
         transition: background-color 0.3s, color 0.3s;
     }
 
-    .suggestions-popup{
+    .suggestions-popup {
         width: 65vw;
         margin-left: 12.5%;
         border-radius: 4vh;
         padding: 2vh;
     }
 
-    .suggestion-item{
+    .suggestion-item {
         width: 50vw;
         padding: 1vh;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10%);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
     }
 }
