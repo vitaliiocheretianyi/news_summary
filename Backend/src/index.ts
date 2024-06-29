@@ -1,6 +1,6 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
-
+import { User } from './models/User'; 
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge';
 
@@ -14,13 +14,18 @@ import { typeDefs as topicDefs } from './schema/topicSchema';
 import { resolvers as topicResolvers } from './resolvers/topicResolver';
 
 import connectDB from './config/database';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 const cors = require('cors');
 dotenv.config();
 
 const app = express();
+
+interface DecodedToken extends JwtPayload {
+
+  userId: string;
+}
 
 async function createServer() {
   try {
@@ -44,9 +49,19 @@ async function createServer() {
         const token = req.headers.authorization || '';
         if (token) {
           try {
-            const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET || 'your_secret_key');
-            console.log("User" + JSON.stringify(decoded))
-            return { user: decoded };
+            const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET) as DecodedToken;
+            console.log("User" + JSON.stringify(decoded));
+    
+            // Fetch user from MongoDB using Mongoose
+            const user = await User.findOne({ _id: decoded.id });
+    
+            if (user) {
+              console.log("User found");
+              return { user }; // User found, pass user object to context
+            } else {
+              console.log("User not found");
+              return { user: null }; // User not found in database
+            }
           } catch (error) {
             console.error('Failed to verify token:', error);
             return { user: null };
@@ -62,7 +77,7 @@ async function createServer() {
     // Apply Apollo middleware to the Express application
 
     const corsOptions = {
-      origin: 'http://localhost:3000', // Ensure this matches the frontend URL
+      origin: process.env.ORIGIN_URI, // Ensure this matches the frontend URL
       credentials: true, // This allows cookies to be sent cross-origin
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       allowedHeaders: ['Content-Type', 'Authorization'],

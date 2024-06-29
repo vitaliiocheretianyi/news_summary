@@ -1,132 +1,617 @@
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    color: #d3d3d3;
-}
-
-.search-bar input {
-    width: 20vw;
-    font-size: 0.75vw; /* 50% of 1.5vw */
-    border: none;
-    border: 0.15vw solid transparent; /* 50% of 0.3vw */
-    border-radius: 2vw;
-    padding: 2vh;
-    outline: none;
-    transition: border 0.3s ease-in-out;
-}
-
-.search-bar input:hover {
-    border: 0.15vw solid #d3d3d3; /* 50% of 0.3vw */
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  color: #d3d3d3;
+  overflow: hidden; /* Prevent the body from scrolling */
 }
 
 .header {
-    top: 0;
-    left: 0;
-    right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 10vh;
+  padding: 0;
+  background-color: white;
+  border-bottom: 0.15vw solid #d3d3d3;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+}
+
+.burger-menu-container {
+  width: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.burger-menu {
+  font-size: 5vh;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.right-container {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 5%;
+}
+
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.search-bar {
+  width: 60%;
+  height: 5vh;
+  font-size: 2vh;
+  padding: 1vh;
+  border: none;
+  border-bottom: 0.15vw solid transparent;
+  outline: none;
+  transition: border-bottom 0.3s ease-in-out;
+}
+
+.search-bar:focus {
+  border-bottom: 0.15vw solid #d3d3d3;
+}
+
+.profile-icon {
+  font-size: 3vh;
+  cursor: pointer;
+  margin-left: 2vh;
+}
+
+.homepage-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent the container from scrolling */
+}
+
+.main-content {
+  padding-top: 10vh; /* Adjust based on header height */
+  display: flex;
+  width: 100vw;
+  height: calc(100vh - 10vh); /* Adjust height to fit within the viewport */
+  justify-content: space-between; /* Add this line to space between interests and news-summary */
+}
+
+.default-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.interests {
+  padding-top: 2.5vw;
+  width: 40%; /* Adjusted to take up 40% of the width */
+  display: flex;
+  flex-direction: column;
+  border-right: 0.15vw solid #d3d3d3; /* Add right border */
+  height: 100%;
+}
+
+.interests-section {
+  width: 100%; /* Adjusted to take up 60% of the width */
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Ensure the interests section can scroll */
+  padding-bottom: 10%;
+}
+
+.interests-container {
+  overflow-y: auto; /* Make this section scrollable */
+  width: 100%; /* Ensure it takes up the full width of its container */
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.no-interests {
+  padding: 1vw;
+  font-size: 1.5vw;
+  text-align: center;
+}
+
+.interest-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1vw;
+  border-bottom: 0.15vw solid transparent;
+  cursor: pointer;
+  position: relative;
+  opacity: 1;
+  animation: fadeIn 0.3s forwards;
+  transition: opacity 0.3s;
+}
+
+.interest-item span {
+  padding-left: 5%;
+}
+
+.interest-item button {
+  padding-right: 5%;
+}
+
+.interest-item.fade-out {
+  opacity: 0;
+  animation: fadeOut 0.3s forwards;
+}
+
+.interest-item::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0.15vw;
+  background-color: #d3d3d3; /* Light grey */
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.interest-item:hover::before {
+  opacity: 1;
+}
+
+.interest-item.selected::before {
+  opacity: 1;
+}
+
+.remove-button {
+  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #d3d3d3; /* Light grey */
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.interest-item:hover .remove-button {
+  opacity: 1;
+}
+
+.news-summary {
+  width: 60%; /* Adjusted to take up 60% of the width */
+  padding-top: 2.5vw;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ensure it takes up the full height of its container */
+}
+
+.news-summary-content {
+  padding: 2vw;
+  padding-top: 1vh;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.news-summary-content.fade-in {
+  animation: fadeIn 0.3s forwards;
+}
+
+.news-summary-content.fade-out {
+  animation: fadeOut 0.3s forwards;
+}
+
+.no-interest-message {
+  max-width: 60vw;
+  margin: auto;
+  text-align: center;
+}
+
+.news-articles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1vw;
+  overflow-y: auto; /* Make this section scrollable */
+  max-height: 70vh;
+  margin-top: 2vh;
+  padding-right: 1vw;
+  transition: opacity 0.3s ease-in-out; /* Add transition for opacity */
+}
+
+.news-articles.fade-out {
+  opacity: 0;
+}
+
+.news-post {
+  position: relative;
+  height: 25vh; /* Adjust height as needed */
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  border-radius: 1vw;
+  border-color: transparent;
+  overflow: hidden; /* Ensure child elements are clipped to fit the container */
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s;
+  border-radius: 1vw;
+  z-index: 1; /* Ensure the overlay is on top of the background but below the content */
+}
+
+.news-post-content {
+  position: relative;
+  z-index: 2; /* Ensure content is on top of the overlay */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  transition: opacity 0.3s;
+}
+
+.news-post-content h3 {
+  margin: 0;
+  padding: 1vw;
+  font-size: 1vw;
+  text-align: start;
+}
+
+.news-post-content p {
+  display: none;
+  font-size: 0.75vw;
+  padding: 1vw;
+  text-align: start;
+}
+
+.news-post:hover .overlay {
+  background-color: white;
+  border: 0.15vw solid #d3d3d3; /* Add border on hover */
+}
+
+.news-post:hover .news-post-content h3 {
+  display: none;
+}
+
+.news-post:hover .news-post-content p {
+  display: block;
+  color: black; /* Ensure the description text is visible on a white background */
+}
+
+/* Custom Scrollbar Styles */
+.news-articles::-webkit-scrollbar {
+  width: 0.5vw;
+  opacity: 0; /* Make the scrollbar invisible */
+  transition: opacity 0.3s; /* Smooth transition for appearance */
+}
+
+/* Custom Scrollbar Thumb */
+.news-articles::-webkit-scrollbar-thumb {
+  background-color: #d3d3d3;
+}
+
+/* Show scrollbar on hover */
+.news-articles:hover::-webkit-scrollbar {
+  opacity: 1; /* Make the scrollbar visible on hover */
+}
+
+/* Firefox scrollbar styles */
+.news-articles {
+  scrollbar-width: thin; /* "auto" or "thin" */
+  scrollbar-color: #d3d3d3 transparent; /* Scrollbar thumb and track color */
+}
+
+.suggestions-popup {
+  position: fixed;
+  top: 5.5%; /* Adjust based on header height */
+  left: 0;
+  width: 20vw;
+  z-index: 1001;
+  border: 0.15vw solid #d3d3d3;
+  background-color: white;
+  border-radius: 2vw;
+  max-height: 40vh;
+  overflow-y: auto;
+  margin-top: 1.5%;
+  margin-left: 10%;
+  opacity: 0;
+  transform: translateY(-10%);
+  animation: fadeInDown 0.3s forwards;
+}
+
+.suggestions-popup.fadeOut {
+  animation: fadeOutUp 0.3s forwards;
+}
+
+.suggestions-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.suggestion-item {
+  width: 20vw;
+  padding: 1vw;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background-color: #f0f0f0;
+}
+
+.calendarContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.calendar-button {
+  width: 10vw;
+  height: 5vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border: 0.15vw solid transparent;
+  border-radius: 2vw;
+  color: black;
+  font-size: 2vh;
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.calendar-button:hover {
+  border-color: #000000;
+}
+
+.datesContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  opacity: 0; /* Start with 0 opacity */
+  transform: translateY(-10%); /* Start with a slight offset */
+  animation: showDatesContainer 0.3s forwards; /* Add the animation */
+}
+
+.datesContainer.fade-out-calendar {
+  opacity: 1; /* Start with 100% opacity */
+  transform: translateY(0); /* Start in place */
+  animation: hideDatesContainer 0.3s forwards; /* Add the hide animation */
+}
+
+.custom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1vh;
+  border-bottom: none; /* Remove bottom border */
+}
+
+.custom-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1vh;
+  color: #000000;
+}
+
+.confirm-button {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  background-color: #000000;
+  color: white;
+  border: .1vh solid transparent;
+  border-radius: 1vw;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.confirm-button:hover {
+  color: black;
+  border-color: black;
+}
+
+.react-datepicker {
+  border: none;
+}
+
+.react-datepicker__header {
+  border-bottom: none;
+}
+
+.react-datepicker__day--selected, .react-datepicker__day--in-range {
+  background-color: #e6f7ff; /* light blue */
+  color: black;
+  border-radius: 50%; /* Make days round */
+}
+
+.react-datepicker__day {
+  border-radius: 50%; /* Make all days round */
+}
+
+/* Landscape orientation styles for smaller screens */
+@media (max-width: 768px) {
+  .header {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    padding: 0;
     width: 100%;
+    height: 10vh;
+    padding: 0;
     background-color: white;
     border-bottom: 0.15vw solid #d3d3d3;
     position: fixed;
     top: 0;
     z-index: 1000;
-}
+  }
 
-.profile-icon {
-    padding-left: 50%;
-    align-content: center;
-    padding-top: 2vw; /* 50% of 2vw */
-    padding-bottom: 2vw; /* 50% of 2vw */
-}
+  .burger-menu-container {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-.profile-icon * {
+  .burger-menu {
+    font-size: 5vh;
     cursor: pointer;
-}
+    border: none;
+    background: none;
+  }
 
-.homepage-container {
+  .right-container {
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 5%;
+  }
+
+  .search-bar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .search-bar {
+    width: 80%;
+    height: 5vh;
+    font-size: 2vh;
+    padding: 1vh;
+    border: none;
+    border-bottom: 0.15vw solid transparent;
+    outline: none;
+    transition: border-bottom 0.3s ease-in-out;
+  }
+
+  .search-bar:focus {
+    border-bottom: 0.15vw solid #d3d3d3;
+  }
+
+  .profile-icon {
+    font-size: 3vh;
+    cursor: pointer;
+    margin-left: 2vh;
+  }
+
+  .homepage-container {
     width: 100vw;
     height: 100vh;
     display: flex;
     flex-direction: column;
-}
+    overflow: hidden; /* Prevent the container from scrolling */
+  }
 
-.burger-menu {
-    display: none;
-}
-
-.main-content {
-    padding-top: 5vh;
+  .main-content {
+    padding-top: 10vh; /* Adjust based on header height */
     display: flex;
     width: 100vw;
-    height: 100%;
+    height: calc(100vh - 10vh); /* Adjust height to fit within the viewport */
     justify-content: space-between; /* Add this line to space between interests and news-summary */
-}
+    flex-direction: column; /* Make the main content column */
+    overflow: hidden; /* Ensure main content doesn't scroll */
+  }
 
-.interests {
+  .default-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .interests {
     padding-top: 2.5vw;
-    width: 40%; /* Adjusted to take up 40% of the width */
+    width: 100%; /* Adjusted to take up full width */
+    height: 50%; /* Use percentage height to fit within main content */
     display: flex;
     flex-direction: column;
-    border-right: 0.15vw solid #d3d3d3; /* Add right border */
-    height: 90vh;
-}
+    border-right: none; /* Remove right border */
+    border-bottom: 0.15vw solid #d3d3d3; /* Add bottom border */
+    overflow: auto; /* Allow interests to scroll if needed */
+  }
 
-.interests-section {
-    width: 100%; /* Adjusted to take up 60% of the width */
-    height: 82.5vh;
+  .interests-section {
+    width: 100%; /* Adjusted to take up full width */
+    height: 100%; /* Ensure it takes up the full height of its container */
     display: flex;
     flex-direction: column;
-}
+  }
 
-.interests-container {
-    max-height: 80vh;
-    overflow-y: auto;
+  .interests-container {
+    max-height: 100%; /* Full height */
+    overflow-y: auto; /* Ensure it is scrollable */
     width: 100%; /* Ensure it takes up the full width of its container */
     transition: all 0.3s ease-in-out;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-}
+  }
 
-.no-interests {
+  .no-interests {
     padding: 1vw;
     font-size: 1.5vw;
     text-align: center;
-}
+  }
 
-.interest-item {
+  .interest-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 1vw;
+    width: 98%;
     border-bottom: 0.15vw solid transparent;
     cursor: pointer;
     position: relative;
     opacity: 1;
     animation: fadeIn 0.3s forwards;
     transition: opacity 0.3s;
-}
+  }
 
-.interest-item span {
+  .interest-item span {
+    padding-top: 1.5%;
+    padding-bottom: 1.5%;
     padding-left: 5%;
-}
+    font-size: 3vh;
+  }
 
-.interest-item button {
+  .interest-item button {
     padding-right: 5%;
-}
+    font-size: 3vh;
+  }
 
-.interest-item.fade-out {
+  .interest-item.fade-out {
     opacity: 0;
     animation: fadeOut 0.3s forwards;
-}
+  }
 
-.interest-item::before {
+  .interest-item::before {
     content: '';
     position: absolute;
     bottom: 0;
@@ -136,17 +621,17 @@ body {
     background-color: #d3d3d3; /* Light grey */
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
-}
+  }
 
-.interest-item:hover::before {
+  .interest-item:hover::before {
     opacity: 1;
-}
+  }
 
-.interest-item.selected::before {
+  .interest-item.selected::before {
     opacity: 1;
-}
+  }
 
-.remove-button {
+  .remove-button {
     display: block;
     background: none;
     border: none;
@@ -154,53 +639,155 @@ body {
     color: #d3d3d3; /* Light grey */
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
-}
+  }
 
-.interest-item:hover .remove-button {
+  .interest-item:hover .remove-button {
     opacity: 1;
-}
+  }
 
-.news-summary {
-    width: 60%; /* Adjusted to take up 60% of the width */
+  .news-summary {
+    width: 100%; /* Adjusted to take up full width */
+    height: 50%; /* Use percentage height to fit within main content */
     padding-top: 2.5vw;
     display: flex;
     flex-direction: column;
-}
+    height: 100%; /* Ensure it takes up the full height of its container */
+    overflow: auto; /* Allow news summary to scroll if needed */
+  }
 
-.news-summary-content {
+  .news-summary-content {
     padding: 2vw;
     padding-top: 1vh;
-}
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
 
-.no-interest-message {
+  .news-summary-content.fade-in {
+    animation: fadeIn 0.3s forwards;
+  }
+
+  .news-summary-content.fade-out {
+    animation: fadeOut 0.3s forwards;
+  }
+
+  .no-interest-message {
     max-width: 60vw;
     margin: auto;
     text-align: center;
-}
+  }
 
-.news-articles {
-    display: flex;
-    overflow-x: scroll;
+  .news-articles {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr); /* Single column in portrait */
+    max-height: 100%; /* Full height */
+    overflow-y: auto; /* Ensure it is scrollable */
+    gap: 1vw;
     margin-top: 2vh;
-    max-width: 70vw;
-}
+    padding-right: 1vw;
+    transition: opacity 0.3s ease-in-out; /* Add transition for opacity */
+  }
 
-.article {
-    min-width: 20vw;
+  .news-articles.fade-out {
+    opacity: 0;
+  }
+
+  .news-post {
+    position: relative;
+    height: 70vh; /* Adjust height as needed */
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    border-radius: 4vh;
+    border-color: transparent;
+    overflow: hidden; /* Ensure child elements are clipped to fit the container */
+  }
+
+  .overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: background-color 0.3s;
+    border-radius: 4vh;
+    width: 100%;
+    z-index: 1; /* Ensure the overlay is on top of the background but below the content */
+  }
+
+  .news-post-content {
+    width: 100vw;
+    position: relative;
+    z-index: 2; /* Ensure content is on top of the overlay */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    transition: opacity 0.3s;
+  }
+
+  .news-post-content h3 {
+    width: 80%;
+    margin: 0;
     padding: 1vw;
-    border: 0.15vw solid #d3d3d3;
-    border-radius: 1vw;
-}
+    font-size: 3vh;
+    text-align: start;
+  }
 
-.suggestions-popup {
+  .news-post-content p {
+    display: none;
+    font-size: 0.75vh;
+    padding: 1vw;
+    text-align: start;
+  }
+
+  .news-post:hover .overlay {
+    background-color: white;
+    border: 0.15vw solid #d3d3d3; /* Add border on hover */
+  }
+
+  .news-post:hover .news-post-content h3 {
+    display: none;
+  }
+
+  .news-post:hover .news-post-content p {
+    display: block;
+    color: black; /* Ensure the description text is visible on a white background */
+  }
+
+  /* Custom Scrollbar Styles */
+  .news-articles::-webkit-scrollbar {
+    width: 0.5vw;
+    opacity: 0; /* Make the scrollbar invisible */
+    transition: opacity 0.3s; /* Smooth transition for appearance */
+  }
+
+  /* Custom Scrollbar Thumb */
+  .news-articles::-webkit-scrollbar-thumb {
+    background-color: #d3d3d3;
+  }
+
+  /* Show scrollbar on hover */
+  .news-articles:hover::-webkit-scrollbar {
+    opacity: 1; /* Make the scrollbar visible on hover */
+  }
+
+  /* Firefox scrollbar styles */
+  .news-articles {
+    scrollbar-width: thin; /* "auto" or "thin" */
+    scrollbar-color: #d3d3d3 transparent; /* Scrollbar thumb and track color */
+  }
+
+  .suggestions-popup {
     position: fixed;
-    top: 5vh; /* Adjust based on header height */
-    left: 0;
-    width: 20vw;
+    top: 7.5%; /* Adjust based on header height */
+    left: 15%;
+    width: 70vw;
     z-index: 1001;
     border: 0.15vw solid #d3d3d3;
     background-color: white;
-    border-radius: 2vw;
+    border-radius: 3vh;
     max-height: 40vh;
     overflow-y: auto;
     margin-top: 1.5%;
@@ -208,36 +795,37 @@ body {
     opacity: 0;
     transform: translateY(-10%);
     animation: fadeInDown 0.3s forwards;
-}
+  }
 
-.suggestions-popup.fadeOut {
+  .suggestions-popup.fadeOut {
     animation: fadeOutUp 0.3s forwards;
-}
+  }
 
-.suggestions-list {
+  .suggestions-list {
     list-style-type: none;
     margin: 0;
     padding: 0;
-}
+  }
 
-.suggestion-item {
-    width: 20vw;
-    padding: 1vw;
+  .suggestion-item {
+    width: 90%;
+    padding: 5%;
+    font-size: 2vh;
     cursor: pointer;
-}
+  }
 
-.suggestion-item:hover {
+  .suggestion-item:hover {
     background-color: #f0f0f0;
-}
+  }
 
-.calendarContainer {
+  .calendarContainer {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-}
+  }
 
-.calendar-button {
+  .calendar-button {
     width: 10vw;
     height: 5vh;
     display: flex;
@@ -249,37 +837,46 @@ body {
     color: black;
     font-size: 2vh;
     transition: border-color 0.3s, color 0.3s;
-}
+  }
 
-.calendar-button:hover {
+  .calendar-button:hover {
     border-color: #000000;
-}
+  }
 
-.datesContainer {
+  .datesContainer {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
-}
+    opacity: 0; /* Start with 0 opacity */
+    transform: translateY(-10%); /* Start with a slight offset */
+    animation: showDatesContainer 0.3s forwards; /* Add the animation */
+  }
 
-.custom-header {
+  .datesContainer.fade-out-calendar {
+    opacity: 1; /* Start with 100% opacity */
+    transform: translateY(0); /* Start in place */
+    animation: hideDatesContainer 0.3s forwards; /* Add the hide animation */
+  }
+
+  .custom-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1vh;
     border-bottom: none; /* Remove bottom border */
-}
+  }
 
-.custom-header button {
+  .custom-header button {
     background: none;
     border: none;
     cursor: pointer;
     font-size: 1vh;
     color: #000000;
-}
+  }
 
-.confirm-button {
+  .confirm-button {
     display: block;
     margin: 10px auto;
     padding: 10px 20px;
@@ -289,183 +886,98 @@ body {
     border-radius: 1vw;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
-}
+  }
 
-.confirm-button:hover {
+  .confirm-button:hover {
     color: black;
     border-color: black;
-}
+  }
 
-.react-datepicker {
+  .react-datepicker {
     border: none;
-}
+  }
 
-.react-datepicker__header {
+  .react-datepicker__header {
     border-bottom: none;
-}
+  }
 
-.react-datepicker__day--selected, .react-datepicker__day--in-range {
+  .react-datepicker__day--selected, .react-datepicker__day--in-range {
     background-color: #e6f7ff; /* light blue */
     color: black;
     border-radius: 50%; /* Make days round */
-}
+  }
 
-.react-datepicker__day {
+  .react-datepicker__day {
     border-radius: 50%; /* Make all days round */
-}
-
-@media (max-width: 768px) {
-    .header {
-        top: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: space-evenly;
-        align-items: center;
-        padding: 0;
-        width: 100%;
-        border-bottom: 0.15vw solid #d3d3d3;
-        position: fixed;
-        top: 0;
-        z-index: 1000;
-    }
-
-    .search-bar {
-        align-content: center;
-        width: 80%;
-    }
-
-    .search-bar input {
-        width: 65vw;
-        font-size: 2vh; /* 50% of 1.5vw */
-        border-radius: 5vh;
-        padding: 2vh;
-        padding-right: 0;
-    }
-
-    .profile-icon {
-        font-size: 3vh;
-        padding: 0;
-        border: 0;
-        align-content: center;
-        padding-right: 5%;
-    }
-
-    .burger-menu {
-        padding: 2vh;
-        font-size: 5vh;
-        display: block;
-    }
-
-    .interests {
-        width: 100vw;
-        padding-top: 3vh;
-    }
-
-    .main-content {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding-top: 8vh;
-    }
-
-    .news-summary {
-        width: 100vw;
-    }
-
-    .news-summary-content-text {
-        width: 70vw;
-        font-size: 3vh;
-        word-spacing: 1vh;
-    }
-
-    .article {
-        width: 70vw;
-        height: 20vh;
-    }
-
-    .suggestions-popup {
-        top: 10vh; /* Adjust based on header height in mobile */
-    }
-
-    .calendar-button {
-        width: 50vw;
-        height: 5vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 0.15vw solid transparent;
-        border-radius: 4vw;
-        color: black;
-        font-size: 2vh;
-        transition: border-color 0.3s, color 0.3s;
-    }
-
-    .confirm-button {
-        display: block;
-        margin: 10px auto;
-        padding: 10px 20px;
-        background-color: #000000;
-        color: white;
-        border: .1vh solid transparent;
-        border-radius: 3vh;
-        cursor: pointer;
-        transition: background-color 0.3s, color 0.3s;
-    }
-
-    .suggestions-popup {
-        width: 65vw;
-        margin-left: 12.5%;
-        border-radius: 4vh;
-        padding: 2vh;
-    }
-
-    .suggestion-item {
-        width: 50vw;
-        padding: 1vh;
-    }
+  }
 }
 
 .fade-in {
-    animation: fadeIn 0.3s forwards;
+  animation: fadeIn 0.3s forwards;
+}
+
+.fade-out {
+  animation: fadeOut 0.3s forwards;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10%);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeOutUp {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(-10%);
-    }
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
 }
 
 @keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes showDatesContainer {
+  from {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hideDatesContainer {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
 }

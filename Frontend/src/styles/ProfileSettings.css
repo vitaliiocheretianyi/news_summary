@@ -1,0 +1,151 @@
+/* General Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: white;
+  color: #d3d3d3; /* Off-white grey for text */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.profile-settings-container {
+  width: 45vw; /* 50% of 90vw */
+  max-width: 20vw; /* 50% of 40vw */
+  padding: 0.5vw; /* 50% of 5vw */
+  border-radius: 1vw; /* 50% of 2vw */
+  background-color: white;
+  text-align: center;
+  position: relative;
+}
+
+.profile-settings-header{
+  display: flex;
+  justify-content: flex-start;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.go-back-button {
+  color: #d3d3d3;
+  border: none;
+  font-size: 3vw; /* 50% of 2vw */
+  cursor: pointer;
+  padding: 2% 5%;
+  background-color: transparent;
+}
+
+.go-back-button:hover {
+  color: #ff6b6b; /* Pinkish-red for hover state */
+}
+
+.profile-settings-container h1 {
+  margin-bottom: 20px;
+  color: #d3d3d3;
+}
+
+.profile-settings-message {
+  margin-bottom: 1vw; /* 50% of 2vw */
+  font-size: 0.75vw; /* 50% of 1.5vw */
+  text-align: center;
+}
+
+.profile-settings-message.error {
+  color: #ff6b6b; /* Pinkish-red for error messages */
+}
+
+.profile-settings-message.success {
+  color: #6bff6b; /* Equivalent hue of green for success messages */
+}
+
+.profile-settings-buttons {
+  margin: 10%; /* 50% of 4vw */
+}
+
+.profile-settings-button {
+  width: 100%;
+  padding: 5%; /* 50% of 2vw */
+  font-size: 0.75vw; /* 50% of 1.5vw */
+  border: 0.15vw solid transparent; /* 50% of 0.3vw */
+  border-radius: 1vw; /* 50% of 2vw */
+  background-color: white;
+  color: #d3d3d3;
+  text-align: center;
+  cursor: pointer;
+  transition: border 0.3s ease-in-out;
+}
+
+.profile-settings-button:hover {
+  border: 0.15vw solid #d3d3d3; /* 50% of 0.3vw */
+}
+
+.profile-settings-button.profile-settings-delete {
+  background-color: #ff6b6b;
+  color: white;
+}
+
+.profile-settings-input {
+  width: calc(100% - 20px);
+  padding: 2vw; /* 50% of 4vw */
+  margin: 10px 0;
+  border: none;
+  border-bottom: 0.15vw solid transparent; /* 50% of 0.3vw */
+  outline: none;
+  font-size: 0.75vw; /* 50% of 1.5vw */
+  transition: border-bottom 0.3s ease-in-out;
+}
+
+.profile-settings-input:focus {
+  border-bottom: 0.15vw solid #d3d3d3; /* 50% of 0.3vw */
+}
+
+.profile-settings-form {
+  margin-bottom: 2vw; /* 50% of 4vw */
+}
+
+@media (max-width: 600px) {
+  .profile-settings-container {
+    width: 60vw; /* Adjust to fit portrait view */
+    max-width: none; /* Remove max-width constraint */
+    padding: 5vw; /* Adjust padding for portrait */
+    border-radius: 2vw; /* Adjust border radius for portrait */
+  }
+
+  .profile-settings-button, .profile-settings-input {
+    width: 100%;
+  }
+
+  .profile-settings-button {
+    padding: 2vw; /* Adjust padding for portrait */
+    font-size: 1.5vh; /* Adjust font size for portrait */
+    border: 0.3vw solid transparent; /* Adjust border for portrait */
+    border-radius: 2vw; /* Adjust border radius for portrait */
+  }
+
+  .profile-settings-button:hover {
+    border: 0.3vw solid #d3d3d3; /* Adjust border for portrait */
+  }
+
+  .profile-settings-input {
+    padding: 2vw; /* Adjust padding for portrait */
+    font-size: 1.5vh; /* Adjust font size for portrait */
+    border-bottom: 0.3vw solid transparent; /* Adjust border for portrait */
+  }
+
+  .profile-settings-input:focus {
+    border-bottom: 0.3vw solid #d3d3d3; /* Adjust border for portrait */
+  }
+
+  .profile-settings-message {
+    margin-top: 2vw; /* Adjust margin for portrait */
+    font-size: 1.5vw; /* Adjust font size for portrait */
+  }
+
+  .go-back-button {
+    font-size: 2vh; /* Adjust font size for portrait */
+  }
+}

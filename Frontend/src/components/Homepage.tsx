@@ -6,8 +6,18 @@ import { FaCalendarAlt } from 'react-icons/fa';
 import '../styles/Homepage.css';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { GET_USER_INTERESTS, ADD_INTEREST, REMOVE_INTEREST } from '../mutations/userInterests';
-import { SEARCH_TOPICS } from '../mutations/topics';
+import { SEARCH_TOPICS, HANDLE_NEWS_REQUEST } from '../mutations/topics';
+import { VERIFY_TOKEN_QUERY } from '../mutations/registerAndLogin';
 import { debounce } from '../utils/debounce';
+import NewsPost from './NewsPost';
+
+interface NewsPost {
+  date: string;
+  title: string;
+  imageUrl: string;
+  shortDescription: string;
+  url: string;
+}
 
 const Homepage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,12 +27,16 @@ const Homepage: React.FC = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [calendarClosing, setCalendarClosing] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
   const [interests, setInterests] = useState<string[]>([]);
   const [fadingInterests, setFadingInterests] = useState<string[]>([]);
   const [showNewsSummary, setShowNewsSummary] = useState(false);
   const [isHidingSuggestions, setIsHidingSuggestions] = useState(false);
+  const [isFadingOutNewsSummary, setIsFadingOutNewsSummary] = useState(false);
+  const [newsArticles, setNewsArticles] = useState<NewsPost[]>([]);
+  const [isFadingOutNewsArticles, setIsFadingOutNewsArticles] = useState(false);
 
   const searchRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -32,6 +46,8 @@ const Homepage: React.FC = () => {
   const [searchTopics, { data: searchData }] = useLazyQuery(SEARCH_TOPICS);
   const [addInterest] = useMutation(ADD_INTEREST);
   const [removeInterest] = useMutation(REMOVE_INTEREST);
+  const [handleNewsRequest] = useMutation(HANDLE_NEWS_REQUEST);
+  const [verifyToken] = useLazyQuery(VERIFY_TOKEN_QUERY);
 
   useEffect(() => {
     setInterests(interestsData?.getUserInterests || []);
@@ -57,7 +73,6 @@ const Homepage: React.FC = () => {
       setShowSuggestions(true);
       debouncedSearch(query);
     } else {
-      console.log("Length of the search query is too short!");
       await handleFadeOutSuggestions();
     }
   };
@@ -69,51 +84,76 @@ const Homepage: React.FC = () => {
         setShowSuggestions(false);
         setIsHidingSuggestions(false);
         resolve();
-      }, 300); // Duration of the fade-out animation
+      }, 300);
     });
   };
 
   const handleClickOutside = async (event: MouseEvent) => {
     const newsSummaryElement = document.querySelector('.news-summary');
-  
-    // Check if suggestions list is displayed
+    const interestItemElements = document.querySelectorAll('.interest-item');
+
     if (showSuggestions) {
-      console.log("Suggestions popup is displayed");
       if (
         searchRef.current && !searchRef.current.contains(event.target as Node) &&
         suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)
       ) {
         await handleFadeOutSuggestions();
       }
-    }else{
-      console.log("Suggestions popup is not displayed");
-      // Check if the click is outside of both the calendar and news summary sections
+    } else {
+      const clickedOnInterestItem = Array.from(interestItemElements).some((element) =>
+        element.contains(event.target as Node)
+      );
+
       if (
+        !clickedOnInterestItem &&
+        selectedInterest &&
         newsSummaryElement && !newsSummaryElement.contains(event.target as Node) &&
         searchRef.current && !searchRef.current.contains(event.target as Node)
       ) {
-        setShowCalendar(false);
+        setCalendarClosing(true);
+        setTimeout(() => {
+          setShowCalendar(false);
+          setCalendarClosing(false);
+        }, 300);
         setSelectedInterest(null);
-        setShowNewsSummary(false);
+        setIsFadingOutNewsSummary(true);
+        setTimeout(() => {
+          setShowNewsSummary(false);
+          setIsFadingOutNewsSummary(false);
+        }, 300);
       }
     }
   };
-  
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      verifyToken().then(({ data }) => {
+        if (!data.verifyToken) {
+          localStorage.removeItem('token');
+          navigate('/', { replace: true });
+        }
+      }).catch(() => {
+        localStorage.removeItem('token');
+        navigate('/', { replace: true });
+      });
+    } else {
+      navigate('/', { replace: true });
+    }
+  }, [navigate, verifyToken]);
+
   useEffect(() => {
     const mediaQuery = window.matchMedia("(orientation: portrait)");
     const handleOrientationChange = (e: MediaQueryListEvent) => setIsPortrait(e.matches);
-  
+
     mediaQuery.addEventListener('change', handleOrientationChange);
     document.addEventListener('mousedown', handleClickOutside);
-  
+
     return () => {
       mediaQuery.removeEventListener('change', handleOrientationChange);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showSuggestions, showCalendar]);
-  
-  
-  
+  }, [showSuggestions, showCalendar, selectedInterest]);
 
   const handleAddInterest = async (interestName: string) => {
     try {
@@ -138,6 +178,20 @@ const Homepage: React.FC = () => {
           setInterests((prevInterests) => prevInterests.filter((interest) => interest !== interestName));
           setFadingInterests((prev) => prev.filter((interest) => interest !== interestName));
           refetchInterests();
+
+          if (selectedInterest === interestName) {
+            setCalendarClosing(true);
+            setTimeout(() => {
+              setShowCalendar(false);
+              setCalendarClosing(false);
+            }, 300);
+            setSelectedInterest(null);
+            setIsFadingOutNewsSummary(true);
+            setTimeout(() => {
+              setShowNewsSummary(false);
+              setIsFadingOutNewsSummary(false);
+            }, 300);
+          }
         }, 300);
       }
     } catch (error) {
@@ -146,123 +200,289 @@ const Homepage: React.FC = () => {
   };
 
   const handleShowCalendar = () => {
-    setShowCalendar((prev) => !prev);
-    setShowNewsSummary(true);
-  };
-
-  const highlightWeek = (date: Date) => {
-    const start = date.getDate() - date.getDay();
-    const end = start + 6;
-    const highlightDates = [];
-    for (let i = start; i <= end; i++) {
-      const day = new Date(date);
-      day.setDate(i);
-      highlightDates.push(day);
+    if (showCalendar) {
+      setCalendarClosing(true);
+      setTimeout(() => {
+        setShowCalendar(false);
+        setCalendarClosing(false);
+      }, 300);
+    } else {
+      setShowCalendar(true);
     }
-    return highlightDates;
   };
 
   const handleInterestClick = (interest: string) => {
-    setSelectedInterest(interest);
-    setShowNewsSummary(true);
+    if (selectedInterest === interest) {
+      setSelectedInterest(null);
+      setShowNewsSummary(false);
+      setNewsArticles([]);
+    } else {
+      setIsFadingOutNewsArticles(true);
+      setTimeout(() => {
+        setNewsArticles([]);
+        setIsFadingOutNewsArticles(false);
+        setSelectedInterest(interest);
+        setShowCalendar(false);
+        setShowNewsSummary(true);
+      }, 300);
+    }
+    if (isPortrait) {
+      setShowInterests(false);
+    }
+  };
+
+  const handleDateChange = (date: Date | null) => {
+    setSelectedDate(date);
+    if (date && selectedInterest) {
+      console.log(`Selected date: ${date.toDateString()}, Selected interest: ${selectedInterest}`);
+    }
+  };
+
+  const handleConfirmDate = async () => {
+    if (selectedDate && selectedInterest) {
+      try {
+        const formattedDate = selectedDate.toISOString().split('T')[0];
+        const { data } = await handleNewsRequest({
+          variables: {
+            topicName: selectedInterest,
+            date: formattedDate,
+          },
+        });
+
+        if (data.handleNewsRequest.success) {
+          setNewsArticles(data.handleNewsRequest.newsPosts);
+        } else {
+          setNewsArticles([]);
+        }
+        setCalendarClosing(true);
+        setTimeout(() => {
+          setShowCalendar(false);
+          setCalendarClosing(false);
+        }, 300);
+      } catch (error) {
+        setNewsArticles([]);
+        console.error('Error handling news request:', error);
+      }
+    }
+  };
+
+  const handleBurgerClick = () => {
+    if (isPortrait) {
+      setShowInterests((prev) => !prev);
+      setShowNewsSummary(false);
+    }
   };
 
   return (
     <div className="homepage-container">
       <header className="header">
-        {isPortrait && (
-          <div className="burger-menu" onClick={() => setShowInterests((prev) => !prev)}>
-            {showInterests ? '✖' : '☰'}
+        {isPortrait ? (
+          <div className="burger-menu-container">
+            <button className="burger-menu" onClick={handleBurgerClick}>
+              {showInterests ? '✖' : '☰'}
+            </button>
+          </div>
+        ) : (
+          <div className="search-bar-container">
+            <input
+              ref={searchRef}
+              type="text"
+              placeholder="Search news topics..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onFocus={() => searchTerm.length > 2 && setShowSuggestions(true)}
+              className="search-bar"
+            />
           </div>
         )}
-        <div className="search-bar">
-          <input
-            ref={searchRef}
-            type="text"
-            placeholder="Search news topics..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            onFocus={() => searchTerm.length > 2 && setShowSuggestions(true)}
-          />
-        </div>
-        <div className="profile-icon">
-          <div onClick={() => navigate('/profile-settings')}>
-            👤
-          </div>
+        <div className="right-container">
+          {isPortrait && showInterests ? (
+            <div className="search-bar-container">
+              <input
+                ref={searchRef}
+                type="text"
+                placeholder="Search news topics..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onFocus={() => searchTerm.length > 2 && setShowSuggestions(true)}
+                className="search-bar"
+              />
+            </div>
+          ) : (
+            <div className="profile-icon" onClick={() => navigate('/profile-settings')}>
+              👤
+            </div>
+          )}
         </div>
       </header>
       <main className="main-content">
-        <section className="interests" style={{ display: !isPortrait || showInterests ? 'block' : 'none' }}>
-          <h2>User Interests</h2>
-          <div className="interests-section">
-            {interests.length ? (
-              <div className="interests-container">
-                {interests.map((interest, index) => (
-                  <div
-                    key={index}
-                    className={`interest-item ${selectedInterest === interest ? 'selected' : ''} ${fadingInterests.includes(interest) ? 'fade-out' : ''}`}
-                    onClick={() => handleInterestClick(interest)}
-                  >
-                    <span>{interest}</span>
-                    <button className="remove-button" onClick={(e) => { e.stopPropagation(); handleRemoveInterest(interest); }}>x</button>
+        {isPortrait ? (
+          !selectedInterest && !showInterests ? (
+            <div className="default-message">
+              <h2>Please select an interest to see news articles</h2>
+            </div>
+          ) : (
+            <>
+              {showInterests && (
+                <section className="interests">
+                  <h2>Topics of Interest</h2>
+                  <div className="interests-section">
+                    {interests.length ? (
+                      <div className="interests-container">
+                        {interests.map((interest, index) => (
+                          <div
+                            key={index}
+                            className={`interest-item ${selectedInterest === interest ? 'selected' : ''} ${fadingInterests.includes(interest) ? 'fade-out' : ''}`}
+                            onClick={() => handleInterestClick(interest)}
+                          >
+                            <span>{interest}</span>
+                            <button className="remove-button" onClick={(e) => { e.stopPropagation(); handleRemoveInterest(interest); }}>x</button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="no-interest-message">No interests found.</div>
+                    )}
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="no-interest-message">No interests found.</div>
-            )}
-          </div>
-        </section>
-        <section className="news-summary">
-          <h2>News Summary</h2>
-          {showNewsSummary && (
-            <div className={`news-summary-content ${showNewsSummary ? 'fade-in' : ''}`}>
-              <div className="calendarContainer">
-                <button onClick={handleShowCalendar} className="calendar-button">
-                  <FaCalendarAlt />
-                </button>
-              </div>
-              {showCalendar && (
-                <div className="datesContainer" ref={calendarRef}>
-                  <DatePicker
-                    selected={selectedDate}
-                    onChange={setSelectedDate}
-                    inline
-                    renderCustomHeader={({ date, decreaseMonth, increaseMonth, decreaseYear, increaseYear }) => (
-                      <div className="custom-header">
-                        <button onClick={decreaseYear}>{'<<'}</button>
-                        <button onClick={decreaseMonth}>{'<'}</button>
-                        <span>
-                          {date.toLocaleString('default', { month: 'long' })} {date.getFullYear()}
-                        </span>
-                        <button onClick={increaseMonth}>{'>'}</button>
-                        <button onClick={increaseYear}>{'>>'}</button>
+                </section>
+              )}
+              {showNewsSummary && (
+                <section className="news-summary">
+                  <h2>News Articles</h2>
+                  <div className={`news-summary-content ${showNewsSummary ? 'fade-in' : ''} ${isFadingOutNewsSummary ? 'fade-out' : ''}`}>
+                    <div className="calendarContainer">
+                      <button onClick={handleShowCalendar} className="calendar-button">
+                        <FaCalendarAlt />
+                      </button>
+                    </div>
+                    {showCalendar && (
+                      <div className={`datesContainer ${calendarClosing ? 'fade-out-calendar' : 'show'}`} ref={calendarRef}>
+                        <DatePicker
+                          selected={selectedDate}
+                          onChange={handleDateChange}
+                          inline
+                          renderCustomHeader={({ date, decreaseMonth, increaseMonth, decreaseYear, increaseYear }) => (
+                            <div className="custom-header">
+                              <button onClick={decreaseYear}>{'<<'}</button>
+                              <button onClick={decreaseMonth}>{'<'}</button>
+                              <span>
+                                {date.toLocaleString('default', { month: 'long' })} {date.getFullYear()}
+                              </span>
+                              <button onClick={increaseMonth}>{'>'}</button>
+                              <button onClick={increaseYear}>{'>>'}</button>
+                            </div>
+                          )}
+                        />
+                        <button className="confirm-button" onClick={handleConfirmDate}>Confirm</button>
                       </div>
                     )}
-                    highlightDates={highlightWeek(selectedDate!)}
-                  />
-                  <button className="confirm-button">Confirm</button>
-                </div>
+                    <div className={`news-articles ${isFadingOutNewsArticles ? 'fade-out' : ''}`}>
+                      {selectedDate && newsArticles.length > 0 ? (
+                        newsArticles.map((article, index) => (
+                          <div
+                            key={index}
+                            className="news-post"
+                            style={{ backgroundImage: `url(${article.imageUrl})` }}
+                          >
+                            <NewsPost
+                              date={article.date}
+                              title={article.title}
+                              imageUrl={article.imageUrl}
+                              shortDescription={article.shortDescription}
+                              url={article.url}
+                            />
+                          </div>
+                        ))
+                      ) : (
+                        <div className="no-articles-message">
+                          {selectedDate ? 'No news articles found for the selected date.' : 'Please select a date from the calendar.'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </section>
               )}
-              <div className="news-summary-content-text">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum dui magna, congue id pharetra non, tristique eget tortor. Morbi lacinia sapien ac justo iaculis facilisis. Vivamus rhoncus mauris ut feugiat porta. Interdum et malesuada fames ac ante ipsum primis in faucibus. In id auctor tellus. Donec diam magna, facilisis eget eros sit amet, dignissim scelerisque eros. Nulla facilisi. Praesent vel congue quam.
+            </>
+          )
+        ) : (
+          <>
+            <section className="interests">
+              <h2>Topics of Interest</h2>
+              <div className="interests-section">
+                {interests.length ? (
+                  <div className="interests-container">
+                    {interests.map((interest, index) => (
+                      <div
+                        key={index}
+                        className={`interest-item ${selectedInterest === interest ? 'selected' : ''} ${fadingInterests.includes(interest) ? 'fade-out' : ''}`}
+                        onClick={() => handleInterestClick(interest)}
+                      >
+                        <span>{interest}</span>
+                        <button className="remove-button" onClick={(e) => { e.stopPropagation(); handleRemoveInterest(interest); }}>x</button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-interest-message">No interests found.</div>
+                )}
               </div>
-              <div className="news-articles">
-                <div className="article">Lorem ipsum dolor sit amet...</div>
-                <div className="article">Lorem ipsum dolor sit amet...</div>
-                <div className="article">Lorem ipsum dolor sit amet...</div>
-                <div className="article">Lorem ipsum dolor sit amet...</div>
-                <div className="article">Lorem ipsum dolor sit amet...</div>
-                <div className="article">Lorem ipsum dolor sit amet...</div>
+            </section>
+            <section className="news-summary">
+              <h2>News Articles</h2>
+              <div className={`news-summary-content ${showNewsSummary ? 'fade-in' : ''} ${isFadingOutNewsSummary ? 'fade-out' : ''}`}>
+                <div className="calendarContainer">
+                  <button onClick={handleShowCalendar} className="calendar-button">
+                    <FaCalendarAlt />
+                  </button>
+                </div>
+                {showCalendar && (
+                  <div className={`datesContainer ${calendarClosing ? 'fade-out-calendar' : 'show'}`} ref={calendarRef}>
+                    <DatePicker
+                      selected={selectedDate}
+                      onChange={handleDateChange}
+                      inline
+                      renderCustomHeader={({ date, decreaseMonth, increaseMonth, decreaseYear, increaseYear }) => (
+                        <div className="custom-header">
+                          <button onClick={decreaseYear}>{'<<'}</button>
+                          <button onClick={decreaseMonth}>{'<'}</button>
+                          <span>
+                            {date.toLocaleString('default', { month: 'long' })} {date.getFullYear()}
+                          </span>
+                          <button onClick={increaseMonth}>{'>'}</button>
+                          <button onClick={increaseYear}>{'>>'}</button>
+                        </div>
+                      )}
+                    />
+                    <button className="confirm-button" onClick={handleConfirmDate}>Confirm</button>
+                  </div>
+                )}
+                <div className={`news-articles ${isFadingOutNewsArticles ? 'fade-out' : ''}`}>
+                  {selectedDate && newsArticles.length > 0 ? (
+                    newsArticles.map((article, index) => (
+                      <div
+                        key={index}
+                        className="news-post"
+                        style={{ backgroundImage: `url(${article.imageUrl})` }}
+                      >
+                        <NewsPost
+                          date={article.date}
+                          title={article.title}
+                          imageUrl={article.imageUrl}
+                          shortDescription={article.shortDescription}
+                          url={article.url}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="no-articles-message">
+                      {selectedDate ? 'No news articles found for the selected date.' : 'Please select a date from the calendar.'}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-          {!showNewsSummary && (
-            <div className="no-interest-message">
-              Please select an interest to view news articles and calendar.
-            </div>
-          )}
-        </section>
+            </section>
+          </>
+        )}
       </main>
       {showSuggestions && (
         <div className={`suggestions-popup ${isHidingSuggestions ? 'fadeOut' : ''}`} ref={suggestionsRef} onAnimationEnd={() => {

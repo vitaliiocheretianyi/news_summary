@@ -1,39 +1,37 @@
 import mongoose from 'mongoose';
 
 interface NewsPost {
-  date: Date;
-  summary: string;
+  title: string;
+  imageUrl: string;
+  shortDescription: string;
   url: string;
 }
 
-interface Week {
-  startDate: Date;
-  endDate: Date;
-  summary: string;
+interface Day {
+  date: Date;
   newsPosts: NewsPost[];
 }
 
 interface TopicDocument extends mongoose.Document {
   name: string;
-  weeks: Week[];
+  days: Day[];
 }
 
 const newsPostSchema = new mongoose.Schema<NewsPost>({
-  date: { type: Date, required: true },
-  summary: { type: String, required: true },
+  title: { type: String, required: true },
+  imageUrl: { type: String },
+  shortDescription: { type: String },
   url: { type: String, required: true }
 });
 
-const weekSchema = new mongoose.Schema<Week>({
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
-  summary: { type: String, required: true },
+const daySchema = new mongoose.Schema<Day>({
+  date: { type: Date, required: true },
   newsPosts: [newsPostSchema]
 });
 
 const topicSchema = new mongoose.Schema<TopicDocument>({
   name: { type: String, required: true, unique: true },
-  weeks: { type: [weekSchema], required: true }
+  days: { type: [daySchema], required: true }
 });
 
 const TopicModel = mongoose.model<TopicDocument>('Topic', topicSchema);

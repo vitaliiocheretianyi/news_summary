@@ -4,7 +4,7 @@ export const typeDefs = gql`
 type Mutation {
   changeUsername(username: String!): Response
   changeEmail(email: String!): Response
-  changePassword(password: String!): Response
+  changePassword(newPassword: String!): Response
   deleteAccount: Response
 }
 
