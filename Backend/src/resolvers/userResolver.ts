@@ -1,102 +1,107 @@
 import { User } from '../models/User';
 import { UserInterest } from '../models/UserInterest';
-import { verifyToken } from '../utils/tokenUtils';
-import { hashPassword, comparePassword, generateToken } from '../utils/auth';
-import { validateEmail } from '../utils/emailUtils'; 
-import { validatePassword } from '../utils/passwordUtils'; 
+import { hashPassword } from '../utils/auth';
 
 export const resolvers = {
   Query: {
-    async getUser(_: any, args, context: { token: string }) {
-      //verifyToken(context.token);
+    async getUser(_: any, args, context: { user: any }) {
+      if (!context.user) {
+        console.log("You must be logged in");
+        return { success: false, message: "You must be logged in" };
+      }
       const user = await User.findById(args.id);
       if (!user) {
-        throw new Error("User not found");
+        console.log("User not found");
+        return { success: false, message: "User not found" };
       }
 
-      return user._id;
+      return user;
     }
   },
   Mutation: {
-    async changeUsername(_: any, {username}: {username: string}, context: { user: any, token: string }) {
+    async changeUsername(_: any, { username }: { username: string }, context: { user: any }) {
       if (!context.user) {
-          throw new Error("Unauthorized");
+        console.log("You must be logged in");
+        return { success: false, message: "You must be logged in" };
       }
-  
-      const user = await User.findById(context.user.id);
-      if (!user) {
-          throw new Error("User not found");
-      }
-  
-      if (user.id.toString() !== context.user.id) {
-          throw new Error("Unauthorized access to delete account");
-      }
+      try {
+        const user = await User.findById(context.user.id);
+        if (!user) {
+          console.log("User not found");
+          return { success: false, message: "User not found" };
+        }
 
-      if (username) user.username = username;
-
-      await user.save();
+        user.username = username;
+        await user.save();
   
-      return { success: true, message: "Username updated successfully" };
+        return { success: true, message: "Username updated successfully" };
+      } catch (error) {
+        console.log(error);
+        return { success: false, message: "An error occurred while changing username" };
+      }
     },
-    async changeEmail(_: any, {email}: {email: string}, context: { user: any, token: string }) {
+    async changeEmail(_: any, { email }: { email: string }, context: { user: any }) {
       if (!context.user) {
-          throw new Error("Unauthorized");
+        console.log("You must be logged in");
+        return { success: false, message: "You must be logged in" };
       }
-  
-      const user = await User.findById(context.user.id);
-      if (!user) {
-          throw new Error("User not found");
-      }
-  
-      if (user.id.toString() !== context.user.id) {
-          throw new Error("Unauthorized access to delete account");
-      }
+      try {
+        const user = await User.findById(context.user.id);
+        if (!user) {
+          console.log("User not found");
+          return { success: false, message: "User not found" };
+        }
 
-      if (email) user.email = email;
-
-      await user.save();
+        user.email = email;
+        await user.save();
   
-      return { success: true, message: "email updated successfully" };
+        return { success: true, message: "Email updated successfully" };
+      } catch (error) {
+        console.log(error);
+        return { success: false, message: "An error occurred while changing email" };
+      }
     },
-    async changePassword(_: any, {password}: {password: string}, context: { user: any, token: string }) {
+    async changePassword(_: any, { newPassword }: { newPassword: string }, context: { user: any }) {
       if (!context.user) {
-          throw new Error("Unauthorized");
+        console.log("You must be logged in");
+        return { success: false, message: "You must be logged in" };
       }
-  
-      const user = await User.findById(context.user.id);
-      if (!user) {
-          throw new Error("User not found");
-      }
-  
-      if (user.id.toString() !== context.user.id) {
-          throw new Error("Unauthorized access to delete account");
-      }
+      try {
+        const user = await User.findById(context.user.id);
+        if (!user) {
+          console.log("User not found");
+          return { success: false, message: "User not found" };
+        }
 
-      if (validatePassword(password)) user.password = await hashPassword(password);
-
-      await user.save();
+        user.password = await hashPassword(newPassword);
+        await user.save();
   
-      return { success: true, message: "Password updated successfully" };
+        return { success: true, message: "Password updated successfully" };
+      } catch (error) {
+        console.log(error);
+        return { success: false, message: "An error occurred while changing password" };
+      }
     },
-
-    async deleteAccount(_: any, args, context: { user: any, token: string }) {
+    async deleteAccount(_: any, args, context: { user: any }) {
       if (!context.user) {
-          throw new Error("Unauthorized");
+        console.log("You must be logged in");
+        return { success: false, message: "You must be logged in" };
       }
+      try {
+        const user = await User.findById(context.user.id);
+        if (!user) {
+          console.log("User not found");
+          return { success: false, message: "User not found" };
+        }
+
+        await UserInterest.deleteMany({ userId: user.id });
+        await User.findByIdAndDelete(user.id);
   
-      const user = await User.findById(context.user.id);
-      if (!user) {
-          throw new Error("User not found");
+        return { success: true, message: "Account deleted successfully" };
+      } catch (error) {
+        console.log(error);
+        return { success: false, message: "An error occurred while deleting the account" };
       }
-  
-      if (user.id.toString() !== context.user.id) {
-          throw new Error("Unauthorized access to delete account");
-      }
-  
-      await UserInterest.deleteMany({ userId: user.id });
-      await User.findByIdAndDelete(user.id);
-  
-      return { success: true, message: "Account deleted successfully" };
     }
   }
 };

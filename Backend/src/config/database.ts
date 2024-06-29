@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 // connect to mongoDB
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/myapp');
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (err) {
     // Since err is of type unknown, you need to assert the type or use optional chaining if possible

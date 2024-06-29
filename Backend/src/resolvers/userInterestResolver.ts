@@ -5,6 +5,7 @@ import { AuthenticationError } from 'apollo-server-express';
 export const resolvers = {
   Query: {
     getUserInterests: async (_: any, __: any, { user }: { user: { id: string } }) => {
+      console.log("Invoking function to get all the interests")
       if (!user) {
         throw new AuthenticationError('You must be logged in');
       }

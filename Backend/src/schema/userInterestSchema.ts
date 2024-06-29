@@ -18,5 +18,5 @@ export const typeDefs = gql`
   type Mutation {
     addInterest(interestName: String!): Boolean
     removeInterest(interestName: String!): Boolean
-  }  
+  }
 `;
